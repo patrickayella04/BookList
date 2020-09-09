@@ -47,6 +47,14 @@ UI.prototype.showAlert = function (message, className) {
     }, 3000);
 }
 
+//  Delete Book
+UI.prototype.deleteBook = function (target) {
+    
+    if (target.className === 'delete') {
+        target.parentElement.parentElement.remove() // ParentElement Twice -  we want to delete the parent of the parent of the delete <a> tag. (Basic DOM traversing)
+    };
+
+}
 // Clear Fields
 
 UI.prototype.clearFields = function () {
@@ -55,7 +63,7 @@ UI.prototype.clearFields = function () {
     document.getElementById('isbn').value = '';
 }
 
-// Event Listeners
+// Event Listener for add book
 document.getElementById('book-form').addEventListener('submit', function (e) {
    // Get Form Values - When we submit, first we want is to get the fields with the information being submitted. So we create variables for the input VALUES for each input. 
     const title = document.getElementById('title').value, 
@@ -67,6 +75,8 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
 
     // Instantiate UI object
     const ui = new UI();
+
+    // console.log(ui) // You see all prototypes, parts of the UI prototypes
 
     // Validate
     if (title === '' || author === '' || isbn === '') {
@@ -85,13 +95,28 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
     }
 
     
-
-   
-    
-    
-    
-
     e.preventDefault();
 });
 
 // We will now want to add a book to the Table on the UI, and the UI object is going to take care of that for us. 
+
+
+// Event Delegation - if we have something thats going to show up more than once with the same class, or something thats not there when the page loads or is dynamically added we use event delegation. -->
+// Event Listener for delete
+document.getElementById('book-list').addEventListener('click', function (e) {
+    // Instantiate UI object
+    const ui = new UI();
+
+    // Delet book
+    ui.deleteBook(e.target);
+
+    // Show message
+    ui.showAlert('Book Removed!', 'success');
+
+
+
+    // console.log(123) // if we click anywhere in the book-list table body it logs, but what we need to do is target the delete class which is dynamically inserted. Will do this within a prototype method of the UI
+    e.preventDefault();
+}) // we use the parent class not the delete class. 
+
+
