@@ -64,6 +64,60 @@ class UI {
 
 ///////////////////////////////////
 
+// Static Local Storage class
+
+class Store {
+    static getBooks() { // fetches book(what ever is in local storage) from local storage - for rest of methods below
+        let books;
+        if (localStorage.getItem('books') === null) {
+            books = [];
+        } else {
+            books = JSON.parse(localStorage.getItem('books')); // we parse it because we need books to be a javascript object. 
+        }
+
+        return books;
+    }
+
+    static displayBooks() { // take care of displaying stored books in UI
+        const books = Store.getBooks();
+
+        books.forEach(function (book) {
+            const ui = new UI;
+
+            // Add book to UI
+            ui.addBookToList(book);
+        });
+    }
+
+    static addBook(book) { // add books to local storage
+        const books = Store.getBooks()
+
+        books.push(book);
+
+        localStorage.setItem('books', JSON.stringify(books));
+
+
+    }
+
+    static removeBook(isbn) {
+        const books = Store.getBooks();
+
+        books.forEach(function (book, index) {
+            if (book.isbn === isbn) {
+                books.splice(index, 1);
+            }
+        });
+        localStorage.setItem('books', JSON.stringify(books));
+
+    }
+};
+///////////////////////////////////
+
+// DOM Load Event
+document.addEventListener('DOMContentLoaded', Store.displayBooks); // Books are still there on page reload because they were persisted to local storage. 
+
+///////////////////////////////////
+
 // Event Listener for add book
 document.getElementById('book-form').addEventListener('submit', function (e) {
     // Get Form Values - When we submit, first we want is to get the fields with the information being submitted. So we create variables for the input VALUES for each input. 
@@ -86,6 +140,10 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
      } else {
          // Add book to list - now we add a prototype under the (function UI()) above. 
          ui.addBookToList(book);
+
+         // add to local storage - no need to instantiate it as its a static method
+         Store.addBook(book);
+
          
      // Show success
          ui.showAlert('Book Added!', 'success')
@@ -110,6 +168,9 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
  
      // Delet book
      ui.deleteBook(e.target);
+
+     // Remove from Local Storage
+     Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
  
      // Show message
      ui.showAlert('Book Removed!', 'success');
